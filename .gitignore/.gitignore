@@ -1,0 +1,97 @@
+SQLServerConnection Conn;
+Conn = new SQLServerConnection("host=nc-star; port=4100;User ID=test01;
+Password=test01;Database Name=Test ");
+try
+{
+Conn.Open();
+Console.WriteLine ("Connection successful!");
+}
+catch (Exception ex)
+{
+// Connection failed
+Console.WriteLine(ex.Message);
+return;
+}
+SQLServerDataAdapter myDataAdapter = new SQLServerDataAdapter();
+SQLServerCommand DBCmd = new SQLServerCommand("select * from emp",Conn);
+myDataAdapter.SelectCommand = DBCmd;
+// Set up the CommandBuilder
+SQLServerCommandBuilder CommBuild =
+    new SQLServerCommandBuilder(myDataAdapter);
+DataSet myDataSet = new DataSet();
+try
+{
+myDataAdapter.Fill(myDataSet);
+// Now change the salary of the first employee
+DataRow myRow;
+myRow = myDataSet.Tables["Table"].Rows[0];
+myRow["sal"] = 95000;
+// Tell the DataAdapter to resync with the SQL Server server.
+// Without the CommandBuilder, this line would fail.
+myDataAdapter.Update(myDataSet);
+Console.WriteLine ("Update with CommandBuilder Successful!");
+}
+catch (Exception ex)
+{
+// Display any exceptions
+Console.WriteLine (ex.Message);
+}
+// Close the connection
+Conn.Close();
+
+//////
+
+
+      Create a database  
+CREATE DATABASE database_name   
+[ CONTAINMENT = { NONE | PARTIAL } ]  
+[ ON   
+      [ PRIMARY ] <filespec> [ ,...n ]   
+      [ , <filegroup> [ ,...n ] ]   
+      [ LOG ON <filespec> [ ,...n ] ]   
+]   
+[ COLLATE collation_name ]  
+[ WITH  <option> [,...n ] ]  
+[;]  
+
+<option> ::=  
+{  
+      FILESTREAM ( <filestream_option> [,...n ] )  
+    | DEFAULT_FULLTEXT_LANGUAGE = { lcid | language_name | language_alias }  
+    | DEFAULT_LANGUAGE = { lcid | language_name | language_alias }  
+    | NESTED_TRIGGERS = { OFF | ON }  
+    | TRANSFORM_NOISE_WORDS = { OFF | ON}  
+    | TWO_DIGIT_YEAR_CUTOFF = <two_digit_year_cutoff>   
+    | DB_CHAINING { OFF | ON }  
+    | TRUSTWORTHY { OFF | ON }  
+}  
+
+<filestream_option> ::=  
+{  
+      NON_TRANSACTED_ACCESS = { OFF | READ_ONLY | FULL }  
+    | DIRECTORY_NAME = 'directory_name'   
+}  
+
+<filespec> ::=   
+{  
+(  
+    NAME = logical_file_name ,  
+    FILENAME = { 'os_file_name' | 'filestream_path' }   
+    [ , SIZE = size [ KB | MB | GB | TB ] ]   
+    [ , MAXSIZE = { max_size [ KB | MB | GB | TB ] | UNLIMITED } ]   
+    [ , FILEGROWTH = growth_increment [ KB | MB | GB | TB | % ] ]  
+)  
+}  
+
+<filegroup> ::=   
+{  
+FILEGROUP filegroup name [ [ CONTAINS FILESTREAM ] [ DEFAULT ] | CONTAINS MEMORY_OPTIMIZED_DATA ]  
+    <filespec> [ ,...n ]  
+}  
+
+<service_broker_option> ::=  
+{  
+    ENABLE_BROKER  
+  | NEW_BROKER  
+  | ERROR_BROKER_CONVERSATIONS  
+}  
